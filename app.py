@@ -146,14 +146,13 @@ def main():
     )
     
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(conv) 
+    app.add_handler(conv)
     
-    # "Пульс" для GitHub Actions (кожні 15 хв)
     if app.job_queue:
         app.job_queue.run_repeating(whisper_live, interval=900, first=10)
     
-    print("🤖 Бот запущений. Логування в канал активовано.")
-    app.run_polling()
+    print("🤖 Бот запущений.")
+    app.run_polling(drop_pending_updates=True)  # ← додали це
 
 if __name__ == "__main__":
     main()
