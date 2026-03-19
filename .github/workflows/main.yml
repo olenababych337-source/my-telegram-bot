@@ -4,7 +4,8 @@ on:
   push:
     branches: [ main ]
   schedule:
-    - cron: '0 */6 * * *' # Перезапуск кожні 6 годин
+    - cron: '*/30 * * * *' # Перевірка кожні 30 хвилин
+  workflow_dispatch:      # Кнопка для ручного запуску
 
 jobs:
   build:
