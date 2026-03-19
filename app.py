@@ -1,3 +1,4 @@
+import os
 import requests 
 from telegram import Update, BotCommand
 from telegram.ext import (
@@ -8,7 +9,7 @@ from telegram.ext import (
 # ────────────────────────────────────────────
 # Налаштування
 # ────────────────────────────────────────────
-BOT_TOKEN      = "8443475378:AAEXRVthiKcVZJov6CZB7P24FNGsjigIuxA"
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 API_KEY        = "ae394d91-fffb-4098-b7a4-6c33746398a4"
 PARTNER_ID     = "5725025009"
 API_URL        = "https://www-gum3au.world/api/createAd"
