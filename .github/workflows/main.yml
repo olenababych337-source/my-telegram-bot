@@ -1,15 +1,16 @@
 name: Run Bot 24/7
-
 on:
   push:
     branches: [ main ]
   schedule:
-    - cron: '*/30 * * * *' # Перевірка кожні 30 хвилин
-  workflow_dispatch:      # Кнопка для ручного запуску
+    - cron: '0 */5 * * *'  # кожні 5 годин а не 30 хвилин
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 290  # зупиняється за 10 хвилин до наступного запуску
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -20,8 +21,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
       - name: Run Bot
         env:
