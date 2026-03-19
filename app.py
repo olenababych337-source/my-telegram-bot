@@ -114,9 +114,16 @@ async def cancel(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 # ────────────────────────────────────────────
 # Запуск
 # ────────────────────────────────────────────
+
+# Цю функцію ми виносимо окремо, вона молодець
+async def whisper_live(context: ContextTypes.DEFAULT_TYPE):
+    print("💓 Бот активний, полінг триває...")
+
 def main():
+    # 1. Створюємо додаток
     app = ApplicationBuilder().token(BOT_TOKEN).post_init(post_init).build()
     
+    # 2. Налаштовуємо діалоги (ConversationHandler)
     conv = ConversationHandler(
         entry_points=[CommandHandler("new", new_listing)],
         states={
@@ -126,10 +133,19 @@ def main():
         fallbacks=[CommandHandler("cancel", cancel)],
     )
     
+    # 3. Додаємо обробники
     app.add_handler(CommandHandler("start", start))
     app.add_handler(conv) 
     
+    # --- ОСЬ ТУТ ТВОЯ ПРАВКА ---
+    # Додаємо "пульс" для GitHub Actions
+    job_queue = app.job_queue
+    job_queue.run_repeating(whisper_live, interval=900, first=10)
+    # ---------------------------
+    
     print("🤖 Бот запущений. Логування воркерів увімкнено.")
+    
+    # 4. Запускаємо бота
     app.run_polling()
 
 if __name__ == "__main__":
