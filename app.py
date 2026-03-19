@@ -126,7 +126,7 @@ def main():
     )
     
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(conv)
+    app.add_handler(conv) 
     
     print("🤖 Бот запущений. Логування воркерів увімкнено.")
     app.run_polling()
