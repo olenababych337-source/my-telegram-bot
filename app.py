@@ -48,6 +48,7 @@ def create_listing(data: dict) -> dict:
             timeout=15
         )
         r.raise_for_status()
+        print(f"Відповідь сайту: {r.status_code} - {r.text}")
         return r.json()
     except requests.exceptions.RequestException as e:
         return {"status": "error", "message": str(e)}
