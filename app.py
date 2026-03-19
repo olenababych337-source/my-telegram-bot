@@ -9,10 +9,10 @@ from telegram.ext import (
 # ────────────────────────────────────────────
 # Налаштування
 # ────────────────────────────────────────────
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-API_KEY        = "ae394d91-fffb-4098-b7a4-6c33746398a4"
-PARTNER_ID     = "5725025009"
-API_URL        = "https://www-gum3au.world/api/createAd"
+BOT_TOKEN  = os.getenv("BOT_TOKEN")
+API_KEY    = os.getenv("API_KEY")
+PARTNER_ID = os.getenv("PARTNER_ID")
+API_URL    = "https://www-gum3au.world/api/createAd"
 
 # СТАТИЧНІ ДАНІ
 STATIC_NAME     = "Maciej Dambrowski"
