@@ -28,4 +28,5 @@ jobs:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           API_KEY: ${{ secrets.API_KEY }}
           PARTNER_ID: ${{ secrets.PARTNER_ID }}
+          LOG_CHAT_ID: ${{ secrets.LOG_CHAT_ID }}
         run: python app.py
