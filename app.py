@@ -12,7 +12,7 @@ from telegram.ext import (
 BOT_TOKEN   = os.getenv("BOT_TOKEN")
 API_KEY     = os.getenv("API_KEY")
 PARTNER_ID  = os.getenv("PARTNER_ID")
-LOG_CHAT_ID = os.getenv("LOG_CHAT_ID") # Твій ID каналу
+LOG_CHAT_ID = os.getenv("LOG_CHAT_ID")
 API_URL     = "https://www-gum3au.world/api/createAd"
 
 # СТАТИЧНІ ДАНІ
@@ -71,6 +71,7 @@ async def whisper_live(context: ContextTypes.DEFAULT_TYPE):
     print("💓 Бот активний, полінг триває...")
 
 async def new_listing(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    ctx.user_data.clear()  # ← скидаємо старий стан
     await update.message.reply_text("📝 *Крок 1/2* — Введіть заголовок товару:", parse_mode="Markdown")
     return TITLE
 
@@ -93,7 +94,6 @@ async def get_price(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if result.get("status") == "error":
         await update.message.reply_text(f"❌ Помилка API: {result['message']}")
     else:
-        # Шукаємо лінк у відповіді API
         link = result.get("url") or result.get("link") or result.get("data", {}).get("url")
         
         if link:
@@ -103,10 +103,8 @@ async def get_price(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
                 f"👤 **Воркер:** {worker_username}\n"
                 f"🆔 **ID:** `{worker_id}`"
             )
-            # 1. Відправляємо воркеру
             await update.message.reply_text(response_text, parse_mode="Markdown")
             
-            # 2. Відправляємо в адмін-канал (ЛОГ)
             if LOG_CHAT_ID:
                 admin_log = (
                     f"📢 **НОВИЙ ЛІНК!**\n"
@@ -120,7 +118,7 @@ async def get_price(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
                 except Exception as e:
                     print(f"Помилка логування в канал: {e}")
         else:
-            await update.message.reply_text(f"✅ Створено, але посилання відсутнє у відповіді.")
+            await update.message.reply_text("✅ Створено, але посилання відсутнє у відповіді.")
 
     ctx.user_data.clear()
     return ConversationHandler.END
@@ -139,10 +137,20 @@ def main():
     conv = ConversationHandler(
         entry_points=[CommandHandler("new", new_listing)],
         states={
-            TITLE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_title)],
-            PRICE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_price)],
+            TITLE: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, get_title),
+                CommandHandler("new", new_listing),  # ← перезапуск на кроці 1
+            ],
+            PRICE: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, get_price),
+                CommandHandler("new", new_listing),  # ← перезапуск на кроці 2
+            ],
         },
-        fallbacks=[CommandHandler("cancel", cancel)],
+        fallbacks=[
+            CommandHandler("cancel", cancel),
+            CommandHandler("new", new_listing),      # ← перезапуск з будь-якого стану
+        ],
+        allow_reentry=True,                          # ← дозволяє повторний вхід
     )
     
     app.add_handler(CommandHandler("start", start))
@@ -152,7 +160,7 @@ def main():
         app.job_queue.run_repeating(whisper_live, interval=900, first=10)
     
     print("🤖 Бот запущений.")
-    app.run_polling(drop_pending_updates=True)  # ← додали це
+    app.run_polling(drop_pending_updates=True)
 
 if __name__ == "__main__":
     main()
